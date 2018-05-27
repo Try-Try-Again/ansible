@@ -1,0 +1,353 @@
+### Set Hostname with : hostnamectl set-hostname <hostname> ###                           
+### SOMETHING NOT WORKING? CHECK TO SEE IF YOUR NOTES ARE WRONG :D ###
+
+17. Installing Required Software for our Hosting Platform
+
+	1. Install mysql Stuff
+		- apt-get update
+		- apt-get install mysql-server
+			(make sure to install the mysql-server package FIRST before installing the other packages)
+		- apt-get install php7.1-mysql php7.1-fpm monit
+			* If a package isnt located, use apt-cache search <general> | grep <specific>
+		  	  IE. to find mysql with the current php version -> apt-cache search php | grep mysql *
+	
+	2. Install nginx's custom repository (PPA) and install nginx
+		- add-apt-repository ppa:nginx/stable
+		- apt-get update
+		- apt-get install nginx
+
+19. Service Management with systemd
+
+	1. Start and enable services for the web server
+		- systemctl start nginx php7.1-fpm monit
+		- systemctl enable mysql nginx php7.1-fpm monit
+			* Sometimes services' names are changed on update and cause your old systemctl
+			commands to stop working. You can you find the new verion of the service with:
+			systemctl list-unit-files | grep [servicename] *
+
+#25. Creating a System User: Linux Users and Groups
+#
+#	1. Create a user for the new website
+#		- adduser <websiteuser>
+
+27. Basic nginx Webserver Configuration
+
+	1. Rename orginal configuration file
+		- cd /etc/nginx/
+		- mv nginx.conf nginx.conf.ORIG
+
+	2. Replace text in /etc/nginx/nginx.conf with text from file below
+		- ~/git_repos/hosting_platform/config_files/global_nginx
+	
+	3. Create the cache directory
+		- mkdir -p /usr/share/nginx/cache/fcgi
+	
+	4. Test the new nginx.conf file
+		- nginx -t
+
+29. Basic php-fpm Configuration
+
+	1. Install the PHP extentions we need for wordpress
+		- apt-get update
+		- apt-get install php-json php-xmlrpc php-curl php-gd php-xml php-mbstring
+
+	2. Make the directory for php-fpm sockets
+		- mkdir /var/run/php-fpm
+	
+	3. Make sure /etc/php/7.1/fpm/pool.d exists
+
+	4. Backup the php-fpm.conf file
+		- cd /etc/php/7.1/fpm/
+		- cp php-fpm.conf php-fpm.conf.ORIG
+
+	5. Clear the .conf file
+		- echo "" > php-fpm.conf
+	
+	6. Insert text from the following file into php-fpm.conf 
+		- ~/git_repos/hosting_platform/config_files/global_php-fpm.conf
+
+	7. Remove the original (default) pool:
+		- rm /etc/php/7.1/fpm/pool.d/www.conf
+	
+	8. Backup php.ini
+		- cd /etc/php/7.1/fpm
+		- mv php.ini php.ini.ORIG
+		
+	9. Insert text from the following file into php.ini
+		- ~/git_repos/hosting_platform/config_files/php.ini
+
+	*** Restart php7.1-fpm after adding future config file ***
+		- systemctl restart php7.1-fpm
+
+32. MySQL Database Setup and Security
+
+	1. Create a randomized string to use as your mysql root password
+		- echo -n @ && cat /dev/urandom | env LC_CTYPE=C tr -dc [:alnum:] | head -c 15 && echo
+
+	2. Run mysql_secure_installation script
+		- /usr/bin/mysql_secure_installation
+		- proceed through each propt responding 'y' and provide generated password when prompted
+		- store password in cyptographic password manager
+		***research cryptopgraphic password manager(keypass, keypassx, keypass2)***
+		- systemctl restart mysql
+
+35. Configuring an nginx Virtual Host for your Website
+
+	1. Create a system user for this site
+		- adduser <websitename>
+		- mkdir -p /home/<websitename>/logs
+
+	2. Create nginx vhost config file
+		- vim /etc/nginx/conf.d/<websitename>.conf
+
+	3. import text from ~/git_repos/hosting_platform/config_files/nginx_vhost_config 
+
+	4. Edit new .conf file
+		- go to the code block at the bottom of the file
+		- replace the two instances of {{ domain_name }} completly with
+		  <websitename>.com to accept traffic from <websitename>.com
+	          and redirect it to www.<websitename>.com
+		- go to the top code block and replace the {{ domain_name }} 
+	          just like above.
+		- move a few lines down to the line starting with 'root' and 
+	          replace '/yourusername/' with '/<websitename>/'
+		- move down to the # General FastCGI handling block and change
+		  yoursitename.sock to <websiteuser>.sock
+
+36. Removing the Default nginx vhost Configuation (Do Only Once)
+	1. rm /etc/nginx/sites-enabled/default
+
+37. Configuring the php-fpm Pool for your Website
+
+	1. Create file /etc/php/7.1/fpm/pool.d/<websitename>.conf and paste
+	   ~/git_repos/hosting_platform/config_files/php-fpm_nginx_vhost inside
+
+	2. Edit the file:
+		- Change [yoursitename] to [<websitename>]
+		- Yoursitename.sock to <websitename>.sock
+		- Change listen.owner from yourusername to <websitename>
+		- Change user from yourusername to <websitename>
+		- Change bottom dir from /yourusername/ to /<websitename>/
+
+38. Creating a System User for your Website
+
+#	1. Create user
+#		- adduser <websitename> (If not done already)
+
+	2. Create Log Files
+		- cd /home/<websiteuser>/
+		- mkdir logs public_html
+
+	3. Change Ownership on New Files
+		- chown test_site:test_site ./*
+	
+39. Create a Database and DB User in MySQL
+
+	1. Enter the mysql shell
+		- mysql -u root -p
+
+	2. edit ~/git_repos/hosting_platform/config_files/create_database to match
+	   websitename (keep the ' 's) and password and paste into mysql shell
+
+	3. CTRL-D out of mysql
+
+40. Downloading and Installing the WordPress Application
+
+	1. Switch to the Site User
+		- su - <websitename>
+	
+	2. Download and Extract Wordpress
+		- cd public_html
+		- wget https://wordpress.org/latest.tar.gz
+		- tar -zxf latest.tar.gz
+		- rm latest.tar.gz
+		- mv wordpress/* .
+		- rmdir wordpress/
+
+	3. Switch to Root and Restart Web Hosting Services
+		- CTRL-D
+		- systemctl restart php7.1-fpm mysql nginx
+	
+	4. Go through initial Wordpress Database setup
+		- Database Name - <Website Name>
+		- User Name - < Website Name>
+		- Password -  <Database Password>
+		- Database Host - localhost
+		- Table Prefix - wp_
+		- hit the submit button
+		- run the installer	
+
+	5. Set up initial Webiste info
+		- Grab the autogenerated password save it for later
+		- Give the website a title
+		- Make the username super secret. It should never used elsewhere
+		- add your admin email
+		- Hit the install wordpress button
+
+	6. First login
+		- Check to make sure all plugins are up to date
+
+41. Ownership and Permissions on WordPress Files
+
+	1. Change the ownership of the wordpress files to the site user
+		- Run command in ~/git_repos/hosting_platform/config_files/change_site_file_permissions
+		  with the appropriate username
+
+42. WordPress Application Layout and Configuation Tweaks
+
+	1. Edit wp-config to add minor updates
+		- vim /home/<websitename>/public_html/wp-config.php
+	        - make a line under "define('WP_DEBUG', false);"
+		- make the two following lines:
+			/* Auto-updates */
+			define( 'WP_AUTO_UPDATE_CORE', 'minor' );
+
+43. Making Your First Website Live
+# If you apply the wrong urls in the wordpress control panel, you'll lose access with your control panel,
+# wordpress site, or both. You can delete your wordpress mysql database with the following commands
+# -> mysql -u yourusernamehere -p
+# -> DROP DATABASE <databasename>;
+# -> SHOW databases;
+# delete directories in /home/websitename/
+# repeat sections 39. through 42.  
+	1. Log in to your DNS provider and add two records:
+	 	- www.<websitename>.com @.<websitename.com
+		- ad gend these urls in you wordpress configuration menu
+		- wait for the DNS server to propagate before yous start freaking out
+
+46. General Wordpress Settings
+
+	1. Edit your Sitename and Tagline under the 'general settings' submenu
+		on the settings menu.
+	
+	2. Go to the 'permalinks' submenu and set the permalink to 'Post name'
+
+47. Wordpress User Management
+	
+	1. Add a user with 'editor' permissions
+
+
+57. SSH Hardening: Key Based Authentication
+	
+	1. Generate an SSH key
+		- (from the local terminal) ssh-keygen -t ed25519
+
+		*** For older systems use Legacy RSA - ssh-keygen -b 4096 ***
+
+		- secure and backup your private key and private key password
+
+		- backup your public key
+
+	2. Add the public key to your ssh service on your server
+		- (from local terminal) cat ~/.ssh/id_ed25519.pub
+		- copy the text that is returned in your terminal
+		- (in remote machine) ensure ~/.ssh/authorized_keys exists
+		- vim .ssh/authorized_keys and paste in the copied text
+		- vim /etc/ssh/sshd_config
+		- make sure line 'PubkeyAuthentication yes' exists and is active
+		- save file
+		- systemctl reload ssh
+		- disconnect and reconnect to your server
+		- If you successfully connected to the server, go back to the ssh
+		  config file and confirm that the following two lines exit and are active:
+
+		  ChallengeResponseAuthentication no
+		  PasswordAuthtentication no
+		  UsePAM no
+
+		- systemctl reload ssh
+		- Disconnect and reconnect to the server to make sure the key still works
+		- test to make sure password login is disabled my moving your keys out of 
+		  your .ssh folder and attempting to reconnect
+
+61. Monitoring with Monit
+
+	1. If monit isnt installed and enabled yet, do so now.
+		- systemctl enable monit
+		- systemctl start monit
+
+	2. Edit the monit global config file
+		- cd /etc/monit/
+		- mv monitrc monitrc-ORIG
+		- vim /etc/monit/monitrc 
+		- paste in ~/git_repos/hosting_platform/config_files/monitrc
+		- edit dashboard configuration add a username and password
+		- the following lines somewhere to add email alerts:
+
+		  # e-mail alerts
+		  set alert <emailaddress>
+
+		- edit the php-fpm to alert if > 800 MB memory (recomended)
+	
+	3. Create site-specific config files
+		- mkdir /etc/monit/monit.d
+		- cd /etc/monit/monit.d
+		- vim site-<websitename>
+		- copy in ~/git_repos/hosting_platform/config_files/monit_site_config_example.cfg
+		- change the sitename to match the site
+	
+	4. Change monit global config permissions
+		- chmod 600 /etc/monit/monitrc:
+	
+	5. monit -t
+
+62. Securely View Monitoring Stats with SSH Local Forewarding
+	#add netstat -tupln to cards
+	# Check out 'SSH Mastery' by Michael Lucas
+	1. Run on local machine: ssh -L 8383:localhost:2812 root@<server-ip> 
+	#to find your monit login:pass, grep allow /etc/monit/monitrc
+	#swap is bad find out why
+	2. In your local web browser, type localhost:8383
+
+
+65. Filesystem Backups and Restores with tar
+
+	1. Make your backup folder
+		- mkdir /root/site_backups
+
+	2. Test your backup command:
+		- tar -zcf /root/site_backups/<sitename>-$(/bin/date +\%Y-\%m-\%d).tar.gz /home/<user>/ 
+		- cd /root/site_backups/
+		- ls
+	
+	3. Add your backup command to sytem crontab
+		- add a # comment line describing the scheduled command
+		- add in the input for the times scheduled
+		- add the user 
+		- add the command from step 2
+		# recommend using absolute paths to commands in crontabs
+		# find the filepath to a command with which <command>
+
+	4. Restore your application files after an event
+		- tar -zxf <backupname>.tar.gz
+		- rename the compromised website folder with 'HACKED' tag
+			mv /home/<websitename>/public_html/ /home/<websitename>/public_htmlHACKED
+		- from site_backups file, copy the backed up files to website's home dir
+			cp -r home/<websitename>/public_html /home/<websitename>/
+
+66. How to Back Up and Restore Your Website Databases
+
+	1. from root home dir -> vim .my.cnf
+	2. paste in the following:
+		[client]
+		user=root
+		password=<mysqlpassword>
+
+	3. hide your password file:
+		- chmod 600 .my.cnf
+
+	4. create a backup file for your database:
+		mkdir -p /home/<websitename>/backups/db
+
+	5. run the following command to test backup creation:
+		- mysqldump --add-drop-table --databases <websitename> > /home/<websitename>/backups/db/$(/bin/date +\%Y-\%m-\%d).sql.bak
+		- ls /home/<websitename>/backups/db/
+	
+	6. Add this backup command to the system crontab too
+		#follow the same conventions demonstrated in 65-3. recommend staggering schedule by a minute or two
+
+	7. Restore backup after site failure
+		- change to the backup dir -> cd /home/<websitename>/backups/db/
+		- ls
+		- mysql -u root <websitename> < <backupname>
+		#test again after website is back online

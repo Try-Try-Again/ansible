@@ -1,0 +1,5 @@
+cd /home/yourusername/public_html
+chown -R yourusername:www-data .
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;
+chmod 640 /home/yourusername/public_html/wp-config.php;

@@ -1,0 +1,8 @@
+---
+
+- hosts: all
+  vars:
+    #mission 1: edit all config files to adhere to jinja2 
+    #           as you edit them, add the new variable names to a list
+    #           once edited, move to a new folder
+    #DONE!!!

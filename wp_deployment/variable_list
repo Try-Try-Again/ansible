@@ -1,0 +1,15 @@
+#monitrc
+monituser #user for monit service
+monitpass #password for monit service
+
+#monit_site_config_example.cfg
+site_domain # full url to website
+
+#nginx_vhost_config
+domain_name # domain name (ie. "www.{{ domain_name  }")
+yourusername
+yoursitename #should be the same as "yourusername"
+
+#php_fpm_nginx_vhost
+yourusername
+yoursitename
