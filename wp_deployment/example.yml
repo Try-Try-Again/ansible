@@ -8,12 +8,12 @@
 # nuke container and test master playbook. 
 - hosts: all
   vars:
-    ## used for filepaths
-    #    site_name: "tutorialinux"
-    ## used in the website's markup
-    #site_title: "Hope."
-    ## used in the web server configuration file
-    #site_url: "www.tutorialinux.com"
+    # used for filepaths
+    site_name: "tutorialinux"
+    # used in the website's markup
+    site_title: "Hope."
+    # used in the web server configuration file
+    site_url: "www.tutorialinux.com"
 
   tasks:
     - name: Install nginx.

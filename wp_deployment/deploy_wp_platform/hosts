@@ -1,0 +1,2 @@
+[platform]
+10.0.3.209 # ansible_ssh_user=root

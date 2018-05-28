@@ -1,0 +1,25 @@
+---
+# Run with ansible-playbook <filename> -u root
+
+
+- hosts: all
+  vars:
+    #vars are in variable_list ;D
+    #get through basic install phase
+    #
+    #
+
+  tasks:
+    -name: Install Required Software
+     package: name={{ item }} state=present
+     with_items:
+       - htop
+       - wget
+       - vim
+       - nano
+       - curl
+       - mysql-server
+       - php7.1-mysql
+       - php7.1-fpm
+       - monit
+       - nginx
