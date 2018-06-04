@@ -3,9 +3,14 @@
 #Re-learn how to run ONLY if a previous condition has been met
 #Begin creating snippet folder so we don't have to look shit up over and over
 
-- name: Platform Setup
+- name: Install Platform Software
   hosts: platform
   remote_user: root
   roles:
-    - common
+    - install
  
+- name: Configure Platform Software
+  hosts: platform
+  remote_user: root
+  roles:
+    - configure

@@ -1,29 +1,29 @@
 ### Set Hostname with : hostnamectl set-hostname <hostname> ###                           
 ### SOMETHING NOT WORKING? CHECK TO SEE IF YOUR NOTES ARE WRONG :D ###
 
-17. Installing Required Software for our Hosting Platform
+#17. Installing Required Software for our Hosting Platform
 
-	1. Install mysql Stuff
-		- apt-get update
-		- apt-get install mysql-server
-			(make sure to install the mysql-server package FIRST before installing the other packages)
-		- apt-get install php7.1-mysql php7.1-fpm monit
-			* If a package isnt located, use apt-cache search <general> | grep <specific>
-		  	  IE. to find mysql with the current php version -> apt-cache search php | grep mysql *
+#	1. Install mysql Stuff
+#		- apt-get update
+#		- apt-get install mysql-server
+#			(make sure to install the mysql-server package FIRST before installing the other packages)
+#		- apt-get install php7.1-mysql php7.1-fpm monit
+#			* If a package isnt located, use apt-cache search <general> | grep <specific>
+#		  	  IE. to find mysql with the current php version -> apt-cache search php | grep mysql *
 	
-	2. Install nginx's custom repository (PPA) and install nginx
-		- add-apt-repository ppa:nginx/stable
-		- apt-get update
-		- apt-get install nginx
+#	2. Install nginx's custom repository (PPA) and install nginx
+#		- add-apt-repository ppa:nginx/stable
+#		- apt-get update
+#		- apt-get install nginx
 
-19. Service Management with systemd
-
-	1. Start and enable services for the web server
-		- systemctl start nginx php7.1-fpm monit
-		- systemctl enable mysql nginx php7.1-fpm monit
-			* Sometimes services' names are changed on update and cause your old systemctl
-			commands to stop working. You can you find the new verion of the service with:
-			systemctl list-unit-files | grep [servicename] *
+#19. Service Management with systemd
+#
+#	1. Start and enable services for the web server
+#		- systemctl start nginx php7.1-fpm monit
+#		- systemctl enable mysql nginx php7.1-fpm monit
+#			* Sometimes services' names are changed on update and cause your old systemctl
+#			commands to stop working. You can you find the new verion of the service with:
+#			systemctl list-unit-files | grep [servicename] *
 
 #25. Creating a System User: Linux Users and Groups
 #
@@ -78,7 +78,7 @@
 
 	*** Restart php7.1-fpm after adding future config file ***
 		- systemctl restart php7.1-fpm
-
+########################## END CURRENT STAGE ###################################
 32. MySQL Database Setup and Security
 
 	1. Create a randomized string to use as your mysql root password

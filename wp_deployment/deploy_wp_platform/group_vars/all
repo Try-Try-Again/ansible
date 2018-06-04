@@ -1,0 +1,22 @@
+#monitrc
+#
+#user for monit service
+monituser: lakeview_admin 
+#password for monit service
+monitpass: lakeviewf1
+
+#monit_site_config_example.cfg
+#
+#full url to website
+site_domain: www.lakeviewdata.com
+
+#nginx_vhost_config
+#
+# domain name (ie. www.'domain_name')
+domain_name: lakeviewdata.com
+yourusername: lakeviewdata
+#should be the same as "yourusername"
+yoursitename: lakeviewdata
+
+#php_fpm_nginx_vhost
+#yourusername:

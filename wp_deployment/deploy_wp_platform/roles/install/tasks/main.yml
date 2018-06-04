@@ -1,0 +1,41 @@
+---
+- name: INSTALL | Installing basic packages
+  package: name={{ item }} state=present
+  with_items:
+    - wget
+    - vim
+    - nano
+    - curl
+    - git
+
+- name: INSTALL | Installing mysql-server
+  package: name=mysql-server state=present
+
+- name: INSTALL | Installing other required platform packages
+  package: name={{ item }} state=present
+  with_items:
+    - php7.2-mysql
+    - php7.2-fpm
+    - monit
+
+- name: INSTALL | Adding nginx repository
+  apt_repository: repo='ppa:nginx/stable' state=present
+
+- name: INSTALL | Installing Nginx
+  package: name=nginx state=present
+
+- name: INSTALL | STARTING SERVICES
+  systemd: name={{ item }} state=started
+  with_items:
+    - nginx
+    - php7.2-fpm
+    - monit
+
+
+- name: INSTALL | ENABLING SERVICES
+  systemd: name={{ item }} enabled=yes
+  with_items:
+    - mysql
+    - nginx
+    - php7.2-fpm
+    - monit
