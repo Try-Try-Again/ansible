@@ -30,67 +30,67 @@
 #	1. Create a user for the new website
 #		- adduser <websiteuser>
 
-27. Basic nginx Webserver Configuration
-
-	1. Rename orginal configuration file
-		- cd /etc/nginx/
-		- mv nginx.conf nginx.conf.ORIG
-
-	2. Replace text in /etc/nginx/nginx.conf with text from file below
-		- ~/git_repos/hosting_platform/config_files/global_nginx
+#27. Basic nginx Webserver Configuration
+#
+#	1. Rename orginal configuration file
+#		- cd /etc/nginx/
+#		- mv nginx.conf nginx.conf.ORIG
+#
+	#2. Replace text in /etc/nginx/nginx.conf with text from file below
+		#- ~/git_repos/hosting_platform/config_files/global_nginx
+	#
+	#3. Create the cache directory
+		#- mkdir -p /usr/share/nginx/cache/fcgi
+	#
+	#4. Test the new nginx.conf file
+		#- nginx -t
+#
+#29. Basic php-fpm Configuration
+#
+	#1. Install the PHP extentions we need for wordpress
+		#- apt-get update
+		#- apt-get install php-json php-xmlrpc php-curl php-gd php-xml php-mbstring
+#
+	#2. Make the directory for php-fpm sockets
+		#- mkdir /var/run/php-fpm
 	
-	3. Create the cache directory
-		- mkdir -p /usr/share/nginx/cache/fcgi
-	
-	4. Test the new nginx.conf file
-		- nginx -t
+	#3. Make sure /etc/php/7.1/fpm/pool.d exists
 
-29. Basic php-fpm Configuration
+	#4. Backup the php-fpm.conf file
+		#- cd /etc/php/7.1/fpm/
+		#- cp php-fpm.conf php-fpm.conf.ORIG
 
-	1. Install the PHP extentions we need for wordpress
-		- apt-get update
-		- apt-get install php-json php-xmlrpc php-curl php-gd php-xml php-mbstring
+	#5. Clear the .conf file
+		#- echo "" > php-fpm.conf
+	#
+	#6. Insert text from the following file into php-fpm.conf 
+		#- ~/git_repos/hosting_platform/config_files/global_php-fpm.conf
+#
+	##7. Remove the original (default) pool:
+		#- rm /etc/php/7.1/fpm/pool.d/www.conf
+	#
+	#8. Backup php.ini
+		#- cd /etc/php/7.1/fpm
+		#- mv php.ini php.ini.ORIG
+		#
+	#9. Insert text from the following file into php.ini
+		#- ~/git_repos/hosting_platform/config_files/php.ini
+#
+	#*** Restart php7.1-fpm after adding future config file ***
+		#- systemctl restart php7.1-fpm
 
-	2. Make the directory for php-fpm sockets
-		- mkdir /var/run/php-fpm
-	
-	3. Make sure /etc/php/7.1/fpm/pool.d exists
-
-	4. Backup the php-fpm.conf file
-		- cd /etc/php/7.1/fpm/
-		- cp php-fpm.conf php-fpm.conf.ORIG
-
-	5. Clear the .conf file
-		- echo "" > php-fpm.conf
-	
-	6. Insert text from the following file into php-fpm.conf 
-		- ~/git_repos/hosting_platform/config_files/global_php-fpm.conf
-
-	7. Remove the original (default) pool:
-		- rm /etc/php/7.1/fpm/pool.d/www.conf
-	
-	8. Backup php.ini
-		- cd /etc/php/7.1/fpm
-		- mv php.ini php.ini.ORIG
-		
-	9. Insert text from the following file into php.ini
-		- ~/git_repos/hosting_platform/config_files/php.ini
-
-	*** Restart php7.1-fpm after adding future config file ***
-		- systemctl restart php7.1-fpm
-########################## END CURRENT STAGE ###################################
-32. MySQL Database Setup and Security
-
-	1. Create a randomized string to use as your mysql root password
-		- echo -n @ && cat /dev/urandom | env LC_CTYPE=C tr -dc [:alnum:] | head -c 15 && echo
-
-	2. Run mysql_secure_installation script
-		- /usr/bin/mysql_secure_installation
-		- proceed through each propt responding 'y' and provide generated password when prompted
-		- store password in cyptographic password manager
-		***research cryptopgraphic password manager(keypass, keypassx, keypass2)***
-		- systemctl restart mysql
-
+#32. MySQL Database Setup and Security
+#
+	#1. Create a randomized string to use as your mysql root password
+		#- echo -n @ && cat /dev/urandom | env LC_CTYPE=C tr -dc [:alnum:] | head -c 15 && echo
+#
+	#2. Run mysql_secure_installation script
+		#- /usr/bin/mysql_secure_installation
+		#- proceed through each propt responding 'y' and provide generated password when prompted
+		#- store password in cyptographic password manager
+		#***research cryptopgraphic password manager(keypass, keypassx, keypass2)***
+		#- systemctl restart mysql
+############################# END CURRENT STAGE ################################
 35. Configuring an nginx Virtual Host for your Website
 
 	1. Create a system user for this site

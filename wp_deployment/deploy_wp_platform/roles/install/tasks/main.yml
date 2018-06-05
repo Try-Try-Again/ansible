@@ -16,7 +16,18 @@
   with_items:
     - php7.2-mysql
     - php7.2-fpm
+    - python-mysqldb
     - monit
+
+- name: INSTALL | Installing packages required for wordpress
+  package: name={{ item }} state=present
+  with_items:
+    - php-json
+    - php-xmlrpc
+    - php-curl
+    - php-gd
+    - php-xml
+    - php-mbstring
 
 - name: INSTALL | Adding nginx repository
   apt_repository: repo='ppa:nginx/stable' state=present

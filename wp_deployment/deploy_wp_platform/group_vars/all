@@ -20,3 +20,7 @@ yoursitename: lakeviewdata
 
 #php_fpm_nginx_vhost
 #yourusername:
+
+mysql_root_pass: ?pi314159
+
+
