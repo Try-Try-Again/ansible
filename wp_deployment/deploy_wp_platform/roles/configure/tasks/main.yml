@@ -1,4 +1,5 @@
 ---
+
 - name: CONFIGURE | Adding configuration files
   # copy FROM ansible controller to target machine (fetch is the opposite)
   template:
@@ -30,11 +31,14 @@
 - name: CONFIGURE | Removing default pool
   file: path=/etc/php/7.2/fpm/pool.d/www.conf state=absent
 
+- name: CONFIGURE | Removing default Nginx vhost configuration
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
 - name: CONFIGURE | Set MySQL root password before installing
-  debconf: name='mysql-server' question='mysql-server/root_password' value='{{mysql_root_pass | quote}}' vtype='password'
+  debconf: name='mysql-server' question='mysql-server/root_password' value='{{mysql_root_pass }}' vtype='password'
 
 - name: CONFIGURE | Confirm MySQL root password before installing
-  debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{mysql_root_pass | quote}}' vtype='password'
+  debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{mysql_root_pass }}' vtype='password'
 
 - name: CONFIGURE | Deletes anonymous MySQL server user for localhost
   mysql_user: user="" state="absent" login_password="{{ mysql_root_pass }}" login_user=root
@@ -47,7 +51,7 @@
     - ::1
     - "{{ ansible_fqdn }}"
 
-- name: CONFIGURE | Removes the MySQL test database
+- name: CONFIGURE | Removing the MySQL test database
   mysql_db: db=test state=absent login_password="{{ mysql_root_pass }}" login_user=root 
 
 - name: CONFIGURE | Restarting MySQL

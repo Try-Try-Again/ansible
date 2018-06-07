@@ -1,0 +1,7 @@
+---
+
+- name: Create Wordpress Site
+  hosts: platform
+  remote_user: root
+  roles:
+    - create_wp_site

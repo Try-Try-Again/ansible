@@ -15,6 +15,7 @@ site_domain: www.lakeviewdata.com
 # domain name (ie. www.'domain_name')
 domain_name: lakeviewdata.com
 yourusername: lakeviewdata
+website_pass: nevermind0
 #should be the same as "yourusername"
 yoursitename: lakeviewdata
 
@@ -23,4 +24,8 @@ yoursitename: lakeviewdata
 
 mysql_root_pass: ?pi314159
 
+mysql_usr_pass: ?1337haxxor
 
+mysql_privileges:
+  - '{{ yoursitename }}.*:ALL'
+  - '*.*:SUPER,RELOAD,SHOW\ DATABASES'

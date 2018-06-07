@@ -1,0 +1,56 @@
+---
+
+- name: CREATING WEBSITE | Adding website user
+  user:
+    name: "{{ yourusername }}"
+    password: "{{ website_pass }}"
+
+- name: CREATING WEBSITE | Adding website directory
+  file: path=/home/{{ yourusername }}/{{ item }} state=directory owner={{ yourusername }} group={{ yourusername }}
+  with_items:
+    - logs
+    - public_html
+
+- name: CREATING WEBSITE | Creating Nginx vhost config file
+  template:
+    src: "nginx_vhost_config"
+    dest: "/etc/nginx/conf.d/{{ yoursitename }}.conf"
+
+- name: CREATING WEBSITE | Creating php-fpm pool
+  template:
+    src: "php-fpm_nginx_vhost"
+    dest: "/etc/php/7.2/fpm/pool.d/{{ yoursitename }}.conf"
+
+- name: CREATING WEBSITE | Creating mysql-user.cnf
+  template:
+    src: "mysql-user.cnf"
+    dest: "/root/.my.cnf"
+
+- name: CREATING WEBSITE | Creating MySQL database
+  mysql_db:
+    name: "{{ yoursitename }}"
+    login_user: "root"
+    login_password: "{{ mysql_root_pass }}"
+    state: present
+
+- name: CREATING WEBSITE | Creating MySQL user
+  mysql_user:
+    user={{ yoursitename}}
+    password={{ mysql_usr_pass }}
+    state=present
+    priv={{ mysql_privileges|join('/') }}
+   
+    #### WE'RE NOT A THE LEVEL TO DEBUG, FIND A WAY TO READ THE LAMESCRIPT
+    #### INTO A RAW COMMAND ;D 
+    #
+    #
+    #39. create a database and db user in mysql
+    #
+    #1. enter the mysql shell
+    #- mysql -u root -p
+    #
+    #2. edit ~/git_repos/hosting_platform/config_files/create_database to match
+    #websitename (keep the ' 's) and password and paste into mysql shell
+    #
+    #3. CTRL-D out of mysql
+

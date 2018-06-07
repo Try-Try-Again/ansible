@@ -7,7 +7,7 @@
 #		- apt-get update
 #		- apt-get install mysql-server
 #			(make sure to install the mysql-server package FIRST before installing the other packages)
-#		- apt-get install php7.1-mysql php7.1-fpm monit
+#		- apt-get install php7.2-mysql php7.2-fpm monit
 #			* If a package isnt located, use apt-cache search <general> | grep <specific>
 #		  	  IE. to find mysql with the current php version -> apt-cache search php | grep mysql *
 	
@@ -19,8 +19,8 @@
 #19. Service Management with systemd
 #
 #	1. Start and enable services for the web server
-#		- systemctl start nginx php7.1-fpm monit
-#		- systemctl enable mysql nginx php7.1-fpm monit
+#		- systemctl start nginx php7.2-fpm monit
+#		- systemctl enable mysql nginx php7.2-fpm monit
 #			* Sometimes services' names are changed on update and cause your old systemctl
 #			commands to stop working. You can you find the new verion of the service with:
 #			systemctl list-unit-files | grep [servicename] *
@@ -54,10 +54,10 @@
 	#2. Make the directory for php-fpm sockets
 		#- mkdir /var/run/php-fpm
 	
-	#3. Make sure /etc/php/7.1/fpm/pool.d exists
+	#3. Make sure /etc/php/7.2/fpm/pool.d exists
 
 	#4. Backup the php-fpm.conf file
-		#- cd /etc/php/7.1/fpm/
+		#- cd /etc/php/7.2/fpm/
 		#- cp php-fpm.conf php-fpm.conf.ORIG
 
 	#5. Clear the .conf file
@@ -67,17 +67,17 @@
 		#- ~/git_repos/hosting_platform/config_files/global_php-fpm.conf
 #
 	##7. Remove the original (default) pool:
-		#- rm /etc/php/7.1/fpm/pool.d/www.conf
+		#- rm /etc/php/7.2/fpm/pool.d/www.conf
 	#
 	#8. Backup php.ini
-		#- cd /etc/php/7.1/fpm
+		#- cd /etc/php/7.2/fpm
 		#- mv php.ini php.ini.ORIG
 		#
 	#9. Insert text from the following file into php.ini
 		#- ~/git_repos/hosting_platform/config_files/php.ini
 #
-	#*** Restart php7.1-fpm after adding future config file ***
-		#- systemctl restart php7.1-fpm
+	#*** Restart php7.2-fpm after adding future config file ***
+		#- systemctl restart php7.2-fpm
 
 #32. MySQL Database Setup and Security
 #
@@ -90,45 +90,47 @@
 		#- store password in cyptographic password manager
 		#***research cryptopgraphic password manager(keypass, keypassx, keypass2)***
 		#- systemctl restart mysql
-############################# END CURRENT STAGE ################################
-35. Configuring an nginx Virtual Host for your Website
 
-	1. Create a system user for this site
-		- adduser <websitename>
-		- mkdir -p /home/<websitename>/logs
+#35. Configuring an nginx Virtual Host for your Website
+#
+	#1. Create a system user for this site
+		#- adduser <websitename>
+		#- mkdir -p /home/<websitename>/logs
+#
+	#2. Create nginx vhost config file
+		#- vim /etc/nginx/conf.d/<websitename>.conf
+#
+	#3. import text from ~/git_repos/hosting_platform/config_files/nginx_vhost_config 
+#
+	#4. Edit new .conf file
+		#- go to the code block at the bottom of the file
+		#- replace the two instances of {{ domain_name }} completly with
+		  #<websitename>.com to accept traffic from <websitename>.com
+	          #and redirect it to www.<websitename>.com
+		#- go to the top code block and replace the {{ domain_name }} 
+	          #just like above.
+		#- move a few lines down to the line starting with 'root' and 
+	          #replace '/yourusername/' with '/<websitename>/'
+		#- move down to the # General FastCGI handling block and change
+		  #yoursitename.sock to <websiteuser>.sock
+#
 
-	2. Create nginx vhost config file
-		- vim /etc/nginx/conf.d/<websitename>.conf
+#36. Removing the Default nginx vhost Configuation (Do Only Once)
+#	1. rm /etc/nginx/sites-enabled/default
 
-	3. import text from ~/git_repos/hosting_platform/config_files/nginx_vhost_config 
+#37. Configuring the php-fpm Pool for your Website
+#
+	#1. Create file /etc/php/7.2/fpm/pool.d/<websitename>.conf and paste
+	   #~/git_repos/hosting_platform/config_files/php-fpm_nginx_vhost inside
+#
+	#2. Edit the file:
+		#- Change [yoursitename] to [<websitename>]
+		#- Yoursitename.sock to <websitename>.sock
+		#- Change listen.owner from yourusername to <websitename>
+		#- Change user from yourusername to <websitename>
+		#- Change bottom dir from /yourusername/ to /<websitename>/
 
-	4. Edit new .conf file
-		- go to the code block at the bottom of the file
-		- replace the two instances of {{ domain_name }} completly with
-		  <websitename>.com to accept traffic from <websitename>.com
-	          and redirect it to www.<websitename>.com
-		- go to the top code block and replace the {{ domain_name }} 
-	          just like above.
-		- move a few lines down to the line starting with 'root' and 
-	          replace '/yourusername/' with '/<websitename>/'
-		- move down to the # General FastCGI handling block and change
-		  yoursitename.sock to <websiteuser>.sock
-
-36. Removing the Default nginx vhost Configuation (Do Only Once)
-	1. rm /etc/nginx/sites-enabled/default
-
-37. Configuring the php-fpm Pool for your Website
-
-	1. Create file /etc/php/7.1/fpm/pool.d/<websitename>.conf and paste
-	   ~/git_repos/hosting_platform/config_files/php-fpm_nginx_vhost inside
-
-	2. Edit the file:
-		- Change [yoursitename] to [<websitename>]
-		- Yoursitename.sock to <websitename>.sock
-		- Change listen.owner from yourusername to <websitename>
-		- Change user from yourusername to <websitename>
-		- Change bottom dir from /yourusername/ to /<websitename>/
-
+########################### END CURRENT STAGE #################################
 38. Creating a System User for your Website
 
 #	1. Create user
@@ -166,7 +168,7 @@
 
 	3. Switch to Root and Restart Web Hosting Services
 		- CTRL-D
-		- systemctl restart php7.1-fpm mysql nginx
+		- systemctl restart php7.2-fpm mysql nginx
 	
 	4. Go through initial Wordpress Database setup
 		- Database Name - <Website Name>
